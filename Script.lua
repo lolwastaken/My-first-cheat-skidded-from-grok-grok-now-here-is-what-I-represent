@@ -1,4 +1,4 @@
--- Arsenal Advanced Hub - Vape Style GUI (Mobile + PC)
+-- Arsenal Advanced Hub - Final Version (Mobile + PC) - Loadstring Ready
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
@@ -29,7 +29,7 @@ local currentTab = "Main"
 -- Device Detection
 local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
 
--- ==================== CORE FUNCTIONS ====================
+-- Core Functions
 local function isVisible(targetPart)
     if not WALL_CHECK then return true end
     local origin = camera.CFrame.Position
@@ -67,7 +67,7 @@ local function getClosestPlayer()
     return closest
 end
 
--- Aimbot Loop
+-- Camera Aimbot
 RunService.RenderStepped:Connect(function()
     if not AIMBOT_ENABLED then return end
     local target = getClosestPlayer()
@@ -126,7 +126,7 @@ RunService.Heartbeat:Connect(function()
     end
 end)
 
--- ==================== ADVANCED GUI ====================
+-- ==================== GUI ====================
 task.wait(0.8)
 local playerGui = player:WaitForChild("PlayerGui", 15)
 
@@ -144,7 +144,6 @@ MainFrame.Visible = true
 MainFrame.Parent = ScreenGui
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 12)
 
--- Title
 local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(1, 0, 0, 60)
 Title.BackgroundTransparency = 1
@@ -154,7 +153,6 @@ Title.TextScaled = true
 Title.Font = Enum.Font.GothamBold
 Title.Parent = MainFrame
 
--- Mode Label
 local ModeLabel = Instance.new("TextLabel")
 ModeLabel.Size = UDim2.new(1, 0, 0, 25)
 ModeLabel.Position = UDim2.new(0, 0, 0, 60)
@@ -170,48 +168,41 @@ else
     ModeLabel.Text = "🖥️ PC Mode - Right Shift"
 end
 
--- Tab Buttons
-local tabs = {"Main", "Combat", "Visuals"}
+-- Tabs
+local tabNames = {"Main", "Combat", "Visuals"}
 local tabFrames = {}
 
-for i, tabName in ipairs(tabs) do
-    local tabBtn = Instance.new("TextButton")
-    tabBtn.Size = UDim2.new(0.33, 0, 0, 40)
-    tabBtn.Position = UDim2.new((i-1)*0.33, 0, 0, 90)
-    tabBtn.BackgroundColor3 = currentTab == tabName and Color3.fromRGB(0, 170, 255) or Color3.fromRGB(40, 40, 40)
-    tabBtn.Text = tabName
-    tabBtn.TextColor3 = Color3.new(1,1,1)
-    tabBtn.TextScaled = true
-    tabBtn.Font = Enum.Font.GothamSemibold
-    tabBtn.Parent = MainFrame
-    Instance.new("UICorner", tabBtn).CornerRadius = UDim.new(0, 8)
+for i, name in ipairs(tabNames) do
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0.33, 0, 0, 40)
+    btn.Position = UDim2.new((i-1)*0.33, 0, 0, 90)
+    btn.BackgroundColor3 = currentTab == name and Color3.fromRGB(0, 170, 255) or Color3.fromRGB(40, 40, 40)
+    btn.Text = name
+    btn.TextColor3 = Color3.new(1,1,1)
+    btn.TextScaled = true
+    btn.Font = Enum.Font.GothamSemibold
+    btn.Parent = MainFrame
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
 
-    local tabFrame = Instance.new("Frame")
-    tabFrame.Size = UDim2.new(1, -20, 1, -170)
-    tabFrame.Position = UDim2.new(0, 10, 0, 140)
-    tabFrame.BackgroundTransparency = 1
-    tabFrame.Visible = (currentTab == tabName)
-    tabFrame.Parent = MainFrame
-    tabFrames[tabName] = tabFrame
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(1, -20, 1, -170)
+    frame.Position = UDim2.new(0, 10, 0, 140)
+    frame.BackgroundTransparency = 1
+    frame.Visible = (currentTab == name)
+    frame.Parent = MainFrame
+    tabFrames[name] = frame
 
-    tabBtn.MouseButton1Click:Connect(function()
-        currentTab = tabName
+    btn.MouseButton1Click:Connect(function()
+        currentTab = name
         for _, f in pairs(tabFrames) do f.Visible = false end
-        tabFrame.Visible = true
-        -- Update button colors
-        for _, btn in pairs(MainFrame:GetChildren()) do
-            if btn:IsA("TextButton") and btn.Text == tabName or btn.Text \~= tabName and tabs[1] then
-                -- Simple color update
-            end
-        end
+        frame.Visible = true
     end)
 end
 
--- Toggle Creator
-local function createToggle(parent, name, default, y, callback)
+local function createToggle(parent, name, default, yOffset, callback)
     local f = Instance.new("Frame")
     f.Size = UDim2.new(1, 0, 0, 55)
-    f.Position = UDim2.new(0, 0, 0, y)
+    f.Position = UDim2.new(0, 0, 0, yOffset)
     f.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     f.Parent = parent
     Instance.new("UICorner", f).CornerRadius = UDim.new(0, 10)
@@ -261,7 +252,7 @@ local CloseBtn = Instance.new("TextButton")
 CloseBtn.Size = UDim2.new(0, 140, 0, 50)
 CloseBtn.Position = UDim2.new(0.5, -70, 1, -65)
 CloseBtn.BackgroundColor3 = Color3.fromRGB(200, 40, 40)
-CloseBtn.Text = "CLOSE"
+CloseBtn.Text = "CLOSE GUI"
 CloseBtn.TextColor3 = Color3.new(1,1,1)
 CloseBtn.TextScaled = true
 CloseBtn.Font = Enum.Font.GothamBold
@@ -272,14 +263,15 @@ CloseBtn.MouseButton1Click:Connect(function()
     ScreenGui:Destroy()
 end)
 
--- Mobile Button
+-- Mobile Toggle Button
 if isMobile then
     local mobBtn = Instance.new("TextButton")
     mobBtn.Size = UDim2.new(0, 70, 0, 70)
-    mobBtn.Position = UDim2.new(0, 20, 1, -90)
+    mobBtn.Position = UDim2.new(0, 20, 1, -100)
     mobBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
     mobBtn.Text = "🎮"
     mobBtn.TextScaled = true
+    mobBtn.TextColor3 = Color3.new(1,1,1)
     mobBtn.Parent = ScreenGui
     Instance.new("UICorner", mobBtn).CornerRadius = UDim.new(1,0)
     
@@ -289,7 +281,7 @@ if isMobile then
     end)
 end
 
--- PC RightShift
+-- PC RightShift (only PC)
 if not isMobile then
     UserInputService.InputBegan:Connect(function(input)
         if input.KeyCode == Enum.KeyCode.RightShift then
@@ -299,4 +291,4 @@ if not isMobile then
     end)
 end
 
-print("✅ Advanced Arsenal Hub Loaded | Tab System Added")
+print("✅ Arsenal Advanced Hub Loaded Successfully!")
